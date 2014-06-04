@@ -1,0 +1,19 @@
+{
+    "name": "voceconnect/objects-to-objects",
+    "description": "A WordPress plugin/module that provides the ability to map relationships between posts and other post types",
+    "keywords": ["wordpress", "relationships"],
+    "license": "GPLv2+",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Michael Pretty",
+            "email": "mpretty@voceconnect.com"
+        }
+    ],
+    "require": {
+        "voceconnect/voce-settings-api": "~0.4"
+    },
+    "config": {
+    	"vendor-dir": "vendor"
+    }
+}

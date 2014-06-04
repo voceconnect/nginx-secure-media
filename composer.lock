@@ -1,0 +1,59 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "11b918253b4a4f7c056bb36899b24bfa",
+    "packages": [
+        {
+            "name": "voceconnect/voce-settings-api",
+            "version": "0.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/voceconnect/voce-settings-api.git",
+                "reference": "c4aa55faa2e81abf522297d505378ef159555c51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/voceconnect/voce-settings-api/zipball/c4aa55faa2e81abf522297d505378ef159555c51",
+                "reference": "c4aa55faa2e81abf522297d505378ef159555c51",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "voce-settings-api.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPLv2+"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Pretty",
+                    "email": "mpretty@voceconnect.com"
+                }
+            ],
+            "description": "A simplification of the core WordPress settings API",
+            "time": "2014-06-04 16:08:33"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ],
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}
