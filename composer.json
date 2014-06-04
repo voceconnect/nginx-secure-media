@@ -1,7 +1,7 @@
 {
-    "name": "voceconnect/objects-to-objects",
-    "description": "A WordPress plugin/module that provides the ability to map relationships between posts and other post types",
-    "keywords": ["wordpress", "relationships"],
+    "name": "voceconnect/nginx-secure-media",
+    "description": "A WordPress plugin/module which adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.",
+    "keywords": ["wordpress", "security", "media"],
     "license": "GPLv2+",
     "type": "wordpress-plugin",
     "authors": [
