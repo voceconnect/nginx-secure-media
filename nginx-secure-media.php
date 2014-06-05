@@ -4,7 +4,7 @@
   Plugin Name: NGINX Secure Media
   Plugin URI: http://voceplatforms.com
   Description: Adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.
-  Version: 0.1.0
+  Version: 0.1.2
   Author: Michael Pretty, Voce Platforms
   License: GPL2
  */
@@ -24,7 +24,7 @@ class NGINX_Secure_Media {
 			$voce_settings_api->add_page( 'Secure Media', 'Secure Media', 'nginx-secure-media', 'manage_options', '', 'options-general.php' )
 				->add_group( 'Settings', 'http_secure_link' )
 				//->add_setting( 'Secret Key', 'secret', array( 'description' => 'Secret word shared with NGINX for creating the hash.' ) )->group
-				->add_setting( 'Expire Time', 'expiry', array( 'description' => 'Time in seconds that a link should be valid.', 'sanitize_callbacks' => array( 'vs_sanitize_int' ) ) );
+				->add_setting( 'Expire Time', 'expiry', array( 'description' => 'Minimum time in seconds that a link should be valid.  If you have output caching on, this should be greater than the time set for output caching.', 'sanitize_callbacks' => array( 'vs_sanitize_int' ) ) );
 		}
 		if ( defined( 'HTTP_SECURE_LINK_SECRET' ) ) {
 			$this->secret = HTTP_SECURE_LINK_SECRET;
@@ -55,10 +55,11 @@ class NGINX_Secure_Media {
 		$site_url = untrailingslashit( get_site_url() );
 		if ( false !== strpos( $content, $uploads_url, $site_url ) ) {
 			$secret = $this->secret;
-			$expiry = $this->expiry;
-			$callback = function($matches) use ($secret, $expiry, $siteurl) {
+			$time = time();
+			//to allow the slightest bit of browser caching, we'll round up to the next expiration block
+			$expires = $time + $this->expiry + ( $this->expiry - ( $time % $this->expiry ) );
+			$callback = function($matches) use ($secret, $expires, $site_url) {
 					$path = substr( $matches[0], strlen( $site_url ) );
-					$expires = time() + $expiry;
 					$md5 = base64_encode( md5( $secret . $path . $expires, true ) );
 					$md5 = str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), $md5 );
 					return $matches[0] . '?s=' . $md5 . '&e=' . $expires;
