@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "11b918253b4a4f7c056bb36899b24bfa",
+    "hash": "0c3c844c7d91059f3f922cd19133ce10",
     "packages": [
         {
             "name": "voceconnect/voce-settings-api",

@@ -4,7 +4,7 @@
   Plugin Name: NGINX Secure Media
   Plugin URI: http://voceplatforms.com
   Description: Adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.
-  Version: 0.1.2
+  Version: 0.1.3
   Author: Michael Pretty, Voce Platforms
   License: GPL2
  */
@@ -53,7 +53,7 @@ class NGINX_Secure_Media {
 		$dir_info = wp_upload_dir();
 		$uploads_url = $dir_info['baseurl'];
 		$site_url = untrailingslashit( get_site_url() );
-		if ( false !== strpos( $content, $uploads_url, $site_url ) ) {
+		if ( false !== strpos( $content, $uploads_url ) ) {
 			$secret = $this->secret;
 			$time = time();
 			//to allow the slightest bit of browser caching, we'll round up to the next expiration block
