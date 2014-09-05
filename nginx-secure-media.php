@@ -4,7 +4,7 @@
   Plugin Name: NGINX Secure Media
   Plugin URI: http://voceplatforms.com
   Description: Adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.
-  Version: 0.1.5
+  Version: 0.1.6
   Author: Michael Pretty, Voce Platforms
   License: GPL2
  */
@@ -60,29 +60,22 @@ class NGINX_Secure_Media {
 			$expires = $time + $this->expiry + ( $this->expiry - ( $time % $this->expiry ) );
 			$callback = function($matches) use ($secret, $expires, $site_url) {
 					$original_url = $matches[0];
-					$encoded = strpos( $original_url, '&amp;amp;' ) !== false;
-					if ( $encoded ) {
-						//work around for what the visual editor does to urls
-						$parts = parse_url( $original_url );
-						if ( !empty( $parts['query'] ) ) {
-							$parts['query'] = str_replace('&amp;amp;', '&', $parts['query']);
-							$scheme = isset( $parts['scheme'] ) ? $parts['scheme'] . '://' : '';
-							$host = isset( $parts['host'] ) ? $parts['host'] : '';
-							$port = isset( $parts['port'] ) ? ':' . $parts['port'] : '';
-							$user = isset( $parts['user'] ) ? $parts['user'] : '';
-							$pass = isset( $parts['pass'] ) ? ':' . $parts['pass'] : '';
-							$pass = ($user || $pass) ? "$pass@" : '';
-							$path = isset( $parts['path'] ) ? $parts['path'] : '';
-							$query = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
-							$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
-							$original_url = "$scheme$user$pass$host$port$path$query$fragment";
-						}
+					$encoded_depth = 0;
+					$current_url = $original_url;
+					while ( $current_url !== ($decoded_url = html_entity_decode( $current_url )) ) {
+						$current_url = $decoded_url;
+						$encoded_depth++;
 					}
-					$path = substr( $original_url, strlen( $site_url ) );
+
+					$path = substr( $current_url, strlen( $site_url ) );
 					$md5 = base64_encode( md5( $secret . $path . $expires, true ) );
 					$md5 = str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), $md5 );
-					$new_url = add_query_arg( array( 's' => $md5, 'e' => $expires ), $original_url );
-					return $new_url;
+					$current_url = add_query_arg( array( 's' => $md5, 'e' => $expires ), $current_url );
+					while($encoded_depth > 0) {
+						$encoded_depth--;
+						$current_url = htmlentities($current_url);
+					}
+					return $current_url;
 					//return $matches[0] . '?s=' . $md5 . '&e=' . $expires;
 				};
 			$regex = '/(' . preg_quote( $uploads_url, '/' ) . '[^\s\'"]*)/';
