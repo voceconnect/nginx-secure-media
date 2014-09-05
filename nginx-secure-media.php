@@ -4,7 +4,7 @@
   Plugin Name: NGINX Secure Media
   Plugin URI: http://voceplatforms.com
   Description: Adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.
-  Version: 0.1.6
+  Version: 0.1.7
   Author: Michael Pretty, Voce Platforms
   License: GPL2
  */
@@ -23,7 +23,6 @@ class NGINX_Secure_Media {
 		if ( is_admin() ) {
 			$voce_settings_api->add_page( 'Secure Media', 'Secure Media', 'nginx-secure-media', 'manage_options', '', 'options-general.php' )
 				->add_group( 'Settings', 'http_secure_link' )
-				//->add_setting( 'Secret Key', 'secret', array( 'description' => 'Secret word shared with NGINX for creating the hash.' ) )->group
 				->add_setting( 'Expire Time', 'expiry', array( 'description' => 'Minimum time in seconds that a link should be valid.  If you have output caching on, this should be greater than the time set for output caching.', 'sanitize_callbacks' => array( 'vs_sanitize_int' ) ) );
 		}
 		if ( defined( 'HTTP_SECURE_LINK_SECRET' ) ) {
@@ -67,7 +66,8 @@ class NGINX_Secure_Media {
 						$encoded_depth++;
 					}
 
-					$path = substr( $current_url, strlen( $site_url ) );
+					$url_parts = parse_url($current_url);
+					$path = $url_parts['path'];
 					$md5 = base64_encode( md5( $secret . $path . $expires, true ) );
 					$md5 = str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), $md5 );
 					$current_url = add_query_arg( array( 's' => $md5, 'e' => $expires ), $current_url );
@@ -76,7 +76,6 @@ class NGINX_Secure_Media {
 						$current_url = htmlentities($current_url);
 					}
 					return $current_url;
-					//return $matches[0] . '?s=' . $md5 . '&e=' . $expires;
 				};
 			$regex = '/(' . preg_quote( $uploads_url, '/' ) . '[^\s\'"]*)/';
 			$content = preg_replace_callback( $regex, $callback, $content );
