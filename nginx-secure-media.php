@@ -59,7 +59,7 @@ class NGINX_Secure_Media {
 			//to allow the slightest bit of browser caching, we'll round up to the next expiration block
 			$expires = $time + $this->expiry + ( $this->expiry - ( $time % $this->expiry ) );
 			$callback = function($matches) use ($secret, $expires, $site_url, $uploads_path) {
-					$original_url = $matches[1];
+					$original_url = $matches[2];
 					$encoded_depth = 0;
 					$current_url = $original_url;
 					while ( $current_url !== ($decoded_url = html_entity_decode( $current_url )) ) {
@@ -75,9 +75,9 @@ class NGINX_Secure_Media {
 						$encoded_depth--;
 						$current_url = htmlentities( $current_url );
 					}
-					return $current_url;
+					return $matches[1] . $current_url . $matches[4];
 				};
-			$regex = '/(?:[\'"])((' . preg_quote( $site_url, '/' ) . ')?' . preg_quote( $uploads_path, '/' ) . '(?:[^\s\'"])*)/';
+			$regex = '/([\'"])((' . preg_quote( $site_url, '/' ) . ')?' . preg_quote( $uploads_path, '/' ) . '[^\s\'"]*)([\'"])/';
 			$content = preg_replace_callback( $regex, $callback, $content );
 		}
 		return $content;
