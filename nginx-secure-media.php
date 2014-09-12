@@ -4,7 +4,7 @@
   Plugin Name: NGINX Secure Media
   Plugin URI: http://voceplatforms.com
   Description: Adds a security token and expiration to media uploads which can be used in conjuction with Nginx's http_secure_link_module to limit unauthenticated access.
-  Version: 0.1.7
+  Version: 0.1.8
   Author: Michael Pretty, Voce Platforms
   License: GPL2
  */
@@ -50,14 +50,15 @@ class NGINX_Secure_Media {
 
 	public function filter_media_urls( $content ) {
 		$dir_info = wp_upload_dir();
-		$uploads_url = $dir_info['baseurl'];
 		$site_url = untrailingslashit( get_site_url() );
-		if ( false !== strpos( $content, $uploads_url ) ) {
+		$uploads_url = $dir_info['baseurl'];
+		$uploads_path = str_replace( $site_url, '', $uploads_url );
+		if ( false !== strpos( $content, $uploads_path ) ) {
 			$secret = $this->secret;
 			$time = time();
 			//to allow the slightest bit of browser caching, we'll round up to the next expiration block
 			$expires = $time + $this->expiry + ( $this->expiry - ( $time % $this->expiry ) );
-			$callback = function($matches) use ($secret, $expires, $site_url) {
+			$callback = function($matches) use ($secret, $expires, $site_url, $uploads_path) {
 					$original_url = $matches[0];
 					$encoded_depth = 0;
 					$current_url = $original_url;
@@ -66,18 +67,18 @@ class NGINX_Secure_Media {
 						$encoded_depth++;
 					}
 
-					$url_parts = parse_url($current_url);
+					$url_parts = parse_url( $current_url );
 					$path = $url_parts['path'];
 					$md5 = base64_encode( md5( $secret . $path . $expires, true ) );
 					$md5 = str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), $md5 );
 					$current_url = add_query_arg( array( 's' => $md5, 'e' => $expires ), $current_url );
-					while($encoded_depth > 0) {
+					while ( $encoded_depth > 0 ) {
 						$encoded_depth--;
-						$current_url = htmlentities($current_url);
+						$current_url = htmlentities( $current_url );
 					}
 					return $current_url;
 				};
-			$regex = '/(' . preg_quote( $uploads_url, '/' ) . '[^\s\'"]*)/';
+			$regex = '/[\'"]((' . preg_quote( $site_url, '/' ) . ')?' . preg_quote( $uploads_path, '/' ) . '[^\s\'"]*)/';
 			$content = preg_replace_callback( $regex, $callback, $content );
 		}
 		return $content;
